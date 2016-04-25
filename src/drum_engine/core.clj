@@ -1,38 +1,18 @@
 (ns drum-engine.core
   [:require
    [overtone.core :as ot]]
-  [:use [seesaw.core]])
+  [:use
+   [seesaw.core]
+   [drum-engine.sample-library]])
 
 (def nugs-num-samples 10)
 
 (if-not (ot/server-connected?) (ot/boot-server))
 
-;; load drum samples into map with k/v pairs:
-;; { :sample-name #<buffer[live]: the-sample.aiff> }
-;;
-;; each sample has keys:
-;; :id :size :n-channels :rate :status :path
-;; :args :name :rate-scale :duration :n-samples
-;; :spectral-group
-(def drum-samples
-  (reduce
-   (fn [sample-map samp]
-     (let [sample-name (-> samp
-                           :name
-                           (clojure.string/split  #"\.")
-                           first
-                           keyword)
-           spectral-group (-> samp
-                              :path
-                              (clojure.string/split #"\/")
-                              reverse
-                              second
-                              keyword)
-           samp (assoc samp :spectral-group spectral-group)]
+(defn keyword->int [arg]
+  (Integer. ((comp str name) arg)))
 
-       (assoc sample-map sample-name samp)))
-   {}
-   (ot/load-samples "resources/samples/**/*")))
+(def int->keyword (comp keyword str))
 
 (ot/defsynth play-buf-simple [buf 0 amp 1]
   (let [sig (ot/play-buf:ar :num-channels 1
@@ -41,17 +21,31 @@
                             :action 2)]
     (ot/out:ar 0 (* amp sig))))
 
-(native!)
+(declare gui-content)
 
-(defn combobox-for [spectral-group]
-  (let [samples (filter #(= spectral-group (:spectral-group %)) drum-samples)
-        names (map :name samples)]
-    (combobox :model names)))
+(defn get-current-state []
+  (value gui-content))
+
+(defn combobox-for [num]
+  (let [samples (vals drum-samples)
+        names (map (comp name :name) samples)]
+    (combobox :model names :id ((comp keyword str) num))))
+
+(defn play-sample-at [num _]
+  (let [box-key (int->keyword num)
+        sample-name (keyword (box-key (get-current-state)))
+        sample-buf (sample-name drum-samples)]
+    (play-buf-simple sample-buf)))
+
+(defn sample-button-for [num]
+  (let [action (partial play-sample-at num)]
+    (button :text ">" :listen [:action action])))
 
 (defn sample-select [num]
   (let [label (str "Pad " num ":")
-        boxes (combobox-for :med)]
-    [label boxes]))
+        box (combobox-for num)
+        button (sample-button-for num)]
+    [label box button]))
 
 (def gui-content
   (flow-panel
@@ -59,11 +53,12 @@
    :hgap 20
    :items (flatten (map sample-select (range nugs-num-samples)))))
 
-(def seesaw-frame
+(defonce seesaw-frame
   (frame :title "MIDI Sample Manager"
          :size [800 :by 600]
          :on-close :exit))
 
+(native!) ;; lolwut
 (invoke-later
  (-> seesaw-frame
      pack!
