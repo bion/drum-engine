@@ -1,6 +1,7 @@
 (ns drum-engine.core
   [:use
    [seesaw.core]
+   [drum-engine.storage]
    [drum-engine.gui]])
 
 (def nugs-num-samples 10)
