@@ -9,11 +9,11 @@
   (.exists (clojure.java.io/as-file path)))
 
 (defn datafile-present?
-  ([] default-datafile-path)
+  ([] (datafile-present? default-datafile-path))
   ([path] (file-exists? path)))
 
 (defn read-datafile
-  ([] default-datafile-path)
+  ([] (read-datafile default-datafile-path))
 
   ([path]
    (if (file-exists? path)
