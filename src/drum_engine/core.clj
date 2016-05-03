@@ -2,7 +2,8 @@
   [:use
    [seesaw.core]
    [drum-engine.storage]
-   [drum-engine.gui]])
+   [drum-engine.gui]
+   [drum-engine.sample-library]])
 
 ;; TODO: default-state should reflect real num pads
 (def default-state {:0 :nuggs_song3_clap_snare
@@ -10,8 +11,8 @@
 
 ;; TODO: Initialize store based on config data num pads
 (def store
-  (let [config (if (datafile-present?)
-                 (read-datafile)
+  (let [config (if (db-present?)
+                 (load-pad-samples)
                  default-state)]
     (atom config)))
 

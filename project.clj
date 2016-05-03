@@ -5,4 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[seesaw "1.4.5"]
                  [org.clojure/clojure "1.8.0"]
-                 [overtone "0.10.1"]])
+                 [overtone "0.10.1"]
+                 [org.xerial/sqlite-jdbc "3.8.6"]
+                 [org.clojure/java.jdbc "0.6.0-alpha2"]])
