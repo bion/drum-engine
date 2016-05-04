@@ -5,15 +5,10 @@
    [drum-engine.gui]
    [drum-engine.sample-library]])
 
-;; TODO: default-state should reflect real num pads
-(def default-state {:0 :nuggs_song3_clap_snare
-                    :1 :nuggs_song1_rev_clap})
-
-;; TODO: Initialize store based on config data num pads
 (def store
   (let [config (if (db-present?)
                  (load-pad-samples)
-                 default-state)]
+                 (do (create-db!) (load-pad-samples)))]
     (atom config)))
 
 (def midi-sample-manager-frame
@@ -24,6 +19,7 @@
 (defn sample-selected [pad-name sample-name]
   (swap! store (fn [state]
                  (assoc state pad-name (keyword sample-name))))
+  (update-pad-sample! pad-name sample-name)
   (println @store)
   (render))
 
@@ -35,5 +31,5 @@
 (defn -main [& args]
   (invoke-later (show! midi-sample-manager-frame)
                 (render)))
-(-main)
-(render)
+;; (-main)
+;; (render)

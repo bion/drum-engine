@@ -6,11 +6,12 @@
 (def ^:dynamic *sample-selected* nil)
 (def int->keyword (comp keyword str))
 
-(defn combobox-for [pad-name]
+(defn combobox-for [pad-name current-sample-name]
   (let [samples (vals drum-samples)
         names (map (comp name :name) samples)
         box (combobox :model names :id ((comp keyword str) num))
         callback *sample-selected*]
+    (selection! box (name current-sample-name))
     (listen box :selection (fn [e] (callback pad-name (selection e))))
     box))
 
@@ -24,7 +25,7 @@
 
 (defn sample-select [[pad-name current-sample-name]]
   (let [label (str "Pad " (name pad-name) ":")
-        box (combobox-for pad-name)
+        box (combobox-for pad-name current-sample-name)
         button (sample-button-for current-sample-name)]
     [label box button]))
 

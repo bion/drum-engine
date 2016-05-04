@@ -17,7 +17,8 @@
   ([path]
    (try (db-do-commands (db path)
                         (str "CREATE TABLE pad_samples "
-                             "(pad_name TEXT PRIMARY KEY NOT NULL, "
+                             "(pad_name TEXT NOT NULL, "
+                             "id INTEGER PRIMARY KEY, "
                              "sample_name NOT NULL)"))
         (catch Exception e (println e)))))
 
@@ -42,8 +43,8 @@
   ([path pad-name sample-name]
    (update! (db path)
             :pad_samples
-            {:pad_name (name pad-name)}
-            ["sample_name = ?" (name sample-name)])))
+            {:sample_name (name sample-name)}
+            ["pad_name = ?" (name pad-name)])))
 
 (defn file-exists? [path]
   (.exists (clojure.java.io/as-file path)))
