@@ -13,14 +13,16 @@
 
 (def midi-sample-manager-frame
   (frame :title "MIDI Sample Manager"
-         :size [910 :by 200]))
+         :size [910 :by 200]
+         :on-close :exit))
 
 (declare render)
-(defn sample-selected [pad-name sample-name]
+(defn sample-selected [id sample-name]
   (swap! store (fn [state]
-                 (assoc state pad-name (keyword sample-name))))
-  (update-pad-sample! pad-name sample-name)
-  (println @store)
+                 (update-in state [id]
+                            assoc :sample-name (keyword sample-name))))
+  (update-pad-sample! id sample-name)
+  (println (get @store id))
   (render))
 
 (defn render []
@@ -31,5 +33,6 @@
 (defn -main [& args]
   (invoke-later (show! midi-sample-manager-frame)
                 (render)))
+
 ;; (-main)
 ;; (render)
