@@ -21,11 +21,15 @@
                             :action 2)]
     (ot/out:ar 0 (* amp sig))))
 
+;; TODO
+;; 1. Register device at startup time
+;; 2. Inject device description upon registration
+
 (defn pad-for-sample-map [pad-samples]
-  (reduce (fn [memo pad-sample]
-            (let [key {:channel (:pad_channel_num pad-sample)
-                       :note (:pad_midi_note pad-sample)
-                       :device-description "Samson Graphite M25"}
+  (reduce (fn [memo [id pad-sample]]
+            (let [key {:channel (:pad-channel-num pad-sample)
+                       :note (:pad-midi-note pad-sample)
+                       :device-description "USB2.0-MIDI Port 1"} ;; needs to be dynamic
                   buffer ((:sample-name pad-sample) drum-samples)]
               (assoc memo key buffer)))
           {}

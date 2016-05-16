@@ -42,7 +42,10 @@
         (let [key (:id sample-record)
               value (assoc sample-record
                            :sample-name (-> sample-record :sample_name keyword)
-                           :pad-name (-> sample-record :pad_name keyword))]
+                           :pad-channel-num (:pad_channel_num sample-record)
+                           :pad-midi-note (:pad_midi_note sample-record)
+                           :pad-name (-> sample-record :pad_name keyword))
+              value (dissoc value :sample_name :pad_channel_num :pad_midi_note :pad_name)]
           (assoc coll key value)))
       {}
       pad-samples))))

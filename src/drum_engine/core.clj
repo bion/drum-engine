@@ -3,6 +3,7 @@
    [seesaw.core]
    [drum-engine.storage]
    [drum-engine.gui]
+   [drum-engine.play]
    [drum-engine.sample-library]])
 
 (def store
@@ -26,6 +27,7 @@
   (render))
 
 (defn render []
+  (current-sample-set! @store)
   (config! midi-sample-manager-frame :content (gui-content @store sample-selected)))
 
 (native!) ;; lolwut
