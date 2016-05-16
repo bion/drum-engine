@@ -24,20 +24,33 @@
   (let [action (partial play-sample-at sample-name)]
     (button :text ">" :listen [:action action])))
 
-(defn sample-select [[id {:keys [sample-name pad-name]}]]
-  (let [label (str "Pad " (name pad-name) ":")
+(defn sample-select [label-prefix [id {:keys [sample-name pad-name]}]]
+  (let [label (str label-prefix " pad " (name pad-name) ":")
         box (combobox-for id pad-name sample-name)
         button (sample-button-for sample-name)]
     [label box button]))
 
+(defn pad-sorter [[id-one pad-one] [id-two pad-two]]
+  (let [pad-name-one (:pad-name pad-one)
+        pad-name-two (:pad-name pad-two)]
+    (compare pad-name-one pad-name-two)))
+
 (defn build-items [store sample-selected]
   (binding [*sample-selected* sample-selected]
-    (flatten (map sample-select store))))
+    (let [{:keys [andrew_drumkat marshall_alesis]}
+          (group-by (fn [[id {:keys [device-name]}]] device-name) store)
+
+          andrew_drumkat (sort pad-sorter andrew_drumkat)
+          marshall_alesis (sort pad-sorter marshall_alesis)]
+      (flatten
+       (concat
+        (map (partial sample-select "Nugs") andrew_drumkat)
+        (map (partial sample-select "Mars") marshall_alesis))))))
 
 ;; TODO
-;; add a 'connect' button that calls
-;; current-sample-set!
-;; with the current pad-samples
+;; partition pads on :device_name -> :andrew_drumkat, :marshall_alesis
+;; list each in own section alphabetically
+
 (defn gui-content [store sample-selected]
   (flow-panel ;; using dumbest possible layout for now
    :align :left

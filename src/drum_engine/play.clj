@@ -22,10 +22,15 @@
     (ot/out:ar 0 (* amp sig))))
 
 (defn pad-for-sample-map [pad-samples]
-  (reduce (fn [memo pad-sample]
-            (let [key {:channel (:pad_channel_num pad-sample)
-                       :note (:pad_midi_note pad-sample)
-                       :device-description "Samson Graphite M25"}
+  (reduce (fn [memo [id pad-sample]]
+            (let [device-name (:device-name pad-sample)
+                  key {:channel (:pad-channel-num pad-sample)
+                       :note (:pad-midi-note pad-sample)
+                       :device-description
+                       (cond
+                         (= device-name :marshall_alesis) "mio"
+                         (= device-name :andrew_drumkat) "USB2.0-MIDI Port 1"
+                         :else (println (str "Unknown device - " device-name)))}
                   buffer ((:sample-name pad-sample) drum-samples)]
               (assoc memo key buffer)))
           {}
