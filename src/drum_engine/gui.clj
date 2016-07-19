@@ -47,10 +47,6 @@
         (map (partial sample-select "Nugs") andrew_drumkat)
         (map (partial sample-select "Mars") marshall_alesis))))))
 
-;; TODO
-;; partition pads on :device_name -> :andrew_drumkat, :marshall_alesis
-;; list each in own section alphabetically
-
 (defn gui-content [store sample-selected]
   (flow-panel ;; using dumbest possible layout for now
    :align :left

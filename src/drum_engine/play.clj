@@ -7,11 +7,11 @@
 (def LISTENER_NAME ::dispatcher)
 
 ;; (on-event [:midi :note-on]
-;;                 #(if (and (= (-> % :device :description) "Samson Graphite M25")
-;;                           (= (:note %) 40)
-;;                           (= (:channel %) 9))
-;;                    (sl/play-buf-simple (:nuggs_song1_heavy_snare sl/drum-samples) (:velocity-f %)))
-;;                 ::play-sample)
+;;           #(if (and (= (-> % :device :description) "Samson Graphite M25")
+;;                     (= (:note %) 40)
+;;                     (= (:channel %) 9))
+;;              (sl/play-buf-simple (:nuggs_song1_heavy_snare sl/drum-samples) (:velocity-f %)))
+;;           ::play-sample)
 
 (ot/defsynth play-buf-simple [buf 0 lin-amp 0.5]
   (let [amp (* 0.25 (ot/lin-exp:kr lin-amp 0 1 (ot/db->amp -22)))
