@@ -7,11 +7,11 @@
 (def LISTENER_NAME ::dispatcher)
 
 ;; (on-event [:midi :note-on]
-;;                 #(if (and (= (-> % :device :description) "Samson Graphite M25")
-;;                           (= (:note %) 40)
-;;                           (= (:channel %) 9))
-;;                    (sl/play-buf-simple (:nuggs_song1_heavy_snare sl/drum-samples) (:velocity-f %)))
-;;                 ::play-sample)
+;;           #(if (and (= (-> % :device :description) "Samson Graphite M25")
+;;                     (= (:note %) 40)
+;;                     (= (:channel %) 9))
+;;              (sl/play-buf-simple (:nuggs_song1_heavy_snare sl/drum-samples) (:velocity-f %)))
+;;           ::play-sample)
 
 (ot/defsynth play-buf-simple [buf 0 lin-amp 0.5]
   (let [amp (* 0.25 (ot/lin-exp:kr lin-amp 0 1 (ot/db->amp -22)))
@@ -21,15 +21,16 @@
                             :action 2)]
     (ot/out:ar 0 (* amp sig))))
 
-;; TODO
-;; 1. Register device at startup time
-;; 2. Inject device description upon registration
-
 (defn pad-for-sample-map [pad-samples]
   (reduce (fn [memo [id pad-sample]]
-            (let [key {:channel (:pad-channel-num pad-sample)
+            (let [device-name (:device-name pad-sample)
+                  key {:channel (:pad-channel-num pad-sample)
                        :note (:pad-midi-note pad-sample)
-                       :device-description "USB2.0-MIDI Port 1"} ;; needs to be dynamic
+                       :device-description
+                       (cond
+                         (= device-name :marshall_alesis) "mio"
+                         (= device-name :andrew_drumkat) "USB2.0-MIDI Port 1"
+                         :else (println (str "Unknown device - " device-name)))}
                   buffer ((:sample-name pad-sample) drum-samples)]
               (assoc memo key buffer)))
           {}

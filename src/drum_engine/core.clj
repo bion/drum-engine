@@ -14,7 +14,7 @@
 
 (def midi-sample-manager-frame
   (frame :title "MIDI Sample Manager"
-         :size [910 :by 200]
+         :size [1000 :by 1300]
          :on-close :exit))
 
 (declare render)
