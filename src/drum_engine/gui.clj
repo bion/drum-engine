@@ -4,16 +4,15 @@
    [drum-engine.sample-library]
    [drum-engine.play]])
 
-(def ^:dynamic *sample-selected* nil)
 (def int->keyword (comp keyword str))
 
-(defn combobox-for [id pad-name current-sample-name]
+(defn combobox-for [sample-selected id pad-name current-sample-name]
   (let [samples (vals drum-samples)
         names (map (comp name :name) samples)
-        box (combobox :model names :id id)
-        callback *sample-selected*]
+        box (combobox :model names :id id)]
     (selection! box (name current-sample-name))
-    (listen box :selection (fn [e] (callback id (selection e))))
+    (listen box :selection (fn [e]
+                             (sample-selected id (selection e))))
     box))
 
 (defn play-sample-at [sample-name event]
@@ -24,9 +23,9 @@
   (let [action (partial play-sample-at sample-name)]
     (button :text ">" :listen [:action action])))
 
-(defn sample-select [label-prefix [id {:keys [sample-name pad-name]}]]
+(defn sample-select [label-prefix sample-selected [id {:keys [sample-name pad-name]}]]
   (let [label (str label-prefix " pad " (name pad-name) ":")
-        box (combobox-for id pad-name sample-name)
+        box (combobox-for sample-selected id pad-name sample-name)
         button (sample-button-for sample-name)]
     [label box button]))
 
@@ -36,16 +35,15 @@
     (compare pad-name-one pad-name-two)))
 
 (defn build-items [store sample-selected]
-  (binding [*sample-selected* sample-selected]
-    (let [{:keys [andrew_drumkat marshall_alesis]}
-          (group-by (fn [[id {:keys [device-name]}]] device-name) store)
+  (let [{:keys [andrew_drumkat marshall_alesis]}
+        (group-by (fn [[id {:keys [device-name]}]] device-name) store)
 
-          andrew_drumkat (sort pad-sorter andrew_drumkat)
-          marshall_alesis (sort pad-sorter marshall_alesis)]
-      (flatten
-       (concat
-        (map (partial sample-select "Nugs") andrew_drumkat)
-        (map (partial sample-select "Mars") marshall_alesis))))))
+        andrew_drumkat (sort pad-sorter andrew_drumkat)
+        marshall_alesis (sort pad-sorter marshall_alesis)]
+    (flatten
+     (concat
+      (map (partial sample-select "Nugs" sample-selected) andrew_drumkat)
+      (map (partial sample-select "Mars" sample-selected) marshall_alesis)))))
 
 (defn gui-content [store sample-selected]
   (flow-panel ;; using dumbest possible layout for now
