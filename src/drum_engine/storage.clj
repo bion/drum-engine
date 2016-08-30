@@ -11,7 +11,7 @@
    :subname path})
 
 (defn create-pad-sample!
-  [path device-name pad-name sample-name pad_midi_note pad_channel_num]
+  [path {:keys [device-name pad-name sample-name pad_midi_note pad_channel_num]}]
   (insert! (db path) :pad_samples {:device_name (name device-name)
                                    :pad_name (name pad-name)
                                    :sample_name (name sample-name)
@@ -28,7 +28,7 @@
                             "pad_midi_note INTEGER NOT NULL, "
                             "pad_channel_num INTEGER NOT NULL)"))
        (doseq [pad-sample-seed pad-sample-db-seeds]
-         (create-pad-sample! pad-sample-seed))
+         (create-pad-sample! path pad-sample-seed))
        (catch Exception e (println e))))
 
 (defn load-pad-samples [path]
