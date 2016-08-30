@@ -24,7 +24,7 @@
       :pad_midi_note note
       :pad_channel_num 9})
 
-  (for [note (range 7)]
+  (for [note (range 8)]
     {:device-name :marshall_alesis
      :pad-name (str (+ 1 note))
      :sample-name :ClickPop
